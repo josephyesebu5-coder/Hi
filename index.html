@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Chat</title>
+  <style>
+    body { font-family: sans-serif; }
+    .messages { height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    .message.user { color: green; }
+    .message.ai { color: blue; }
+  </style>
+</head>
+<body>
+  <div class="messages" id="messages"></div>
+  <input type="text" id="userInput" placeholder="Type something...">
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const message = input.value.trim();
+      if(!message) return;
+
+      // Display user message
+      const divUser = document.createElement("div");
+      divUser.className = "message user";
+      divUser.textContent = "You: " + message;
+      document.getElementById("messages").appendChild(divUser);
+
+      input.value = "";
+
+      // Call backend
+      const res = await fetch("http://localhost:3000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+      const data = await res.json();
+      const aiMessage = data.choices[0].message.content;
+
+      // Display AI response
+      const divAI = document.createElement("div");
+      divAI.className = "message ai";
+      divAI.textContent = "AI: " + aiMessage;
+      document.getElementById("messages").appendChild(divAI);
+    }
+  </script>
+</body>
+</html>
